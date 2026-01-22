@@ -1,0 +1,56 @@
+.root {
+    -fx-background-color: #242424;
+}
+
+/* Sidebar */
+.sidebar {
+    -fx-background-color: #1f1f1f;
+    -fx-min-width: 220;
+    -fx-padding: 20;
+    -fx-spacing: 10;
+}
+
+.title {
+    -fx-text-fill: white;
+    -fx-font-size: 18px;
+    -fx-font-weight: bold;
+}
+
+/* Buttons */
+.btn-red {
+    -fx-background-color: #dc2626;
+    -fx-text-fill: white;
+    -fx-font-size: 18px;
+    -fx-font-weight: bold;
+}
+
+.btn-orange {
+    -fx-background-color: #ea580c;
+    -fx-text-fill: white;
+    -fx-font-size: 16px;
+    -fx-font-weight: bold;
+}
+
+.btn-cancel {
+    -fx-background-color: #323232;
+    -fx-text-fill: white;
+    -fx-font-size: 16px;
+}
+
+/* Titles */
+.msg-title {
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+}
+
+.log-title {
+    -fx-text-fill: white;
+    -fx-font-size: 16px;
+    -fx-font-weight: bold;
+}
+
+/* TextArea */
+.text-area {
+    -fx-control-inner-background: #1f2933;
+    -fx-text-fill: white;
+}

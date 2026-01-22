@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<BorderPane xmlns="http://javafx.com/javafx"
+            xmlns:fx="http://javafx.com/fxml"
+            fx:controller="org.shaya.ShayaController"
+            prefWidth="900" prefHeight="700">
+
+    <center>
+        <AnchorPane fx:id="bgPane">
+            <children>
+                <HBox spacing="20"
+                      AnchorPane.topAnchor="0.0"
+                      AnchorPane.bottomAnchor="0.0"
+                      AnchorPane.leftAnchor="0.0"
+                      AnchorPane.rightAnchor="0.0">
+
+                    <!-- SIDEBAR -->
+                    <VBox spacing="10" styleClass="sidebar">
+                        <padding>
+                            <Insets top="20" right="20" bottom="20" left="20"/>
+                        </padding>
+                        <children>
+                            <Label text="Sistema de Alertas" styleClass="title"/>
+                            <TextField fx:id="userIdField" promptText="ID Usuario"/>
+                            <Button fx:id="connectButton"
+                                    text="Conectar"
+                                    onAction="#onConnectClicked"/>
+                        </children>
+                    </VBox>
+
+                    <!-- MAIN CONTENT -->
+                    <VBox spacing="10" VBox.vgrow="ALWAYS">
+                        <padding>
+                            <Insets top="20" right="20" bottom="20" left="0"/>
+                        </padding>
+                        <children>
+
+                            <Button fx:id="redButton"
+                                    text="🚨 ENVIAR ALERTA ROJA"
+                                    maxWidth="Infinity"
+                                    styleClass="btn-red"
+                                    onAction="#onSendRedClicked"/>
+
+                            <Button fx:id="orangeButton"
+                                    text="⚠️ ENVIAR ALERTA NARANJA"
+                                    maxWidth="Infinity"
+                                    styleClass="btn-orange"
+                                    onAction="#onSendOrangeClicked"/>
+
+                            <Button fx:id="cancelButton"
+                                    text="🚫 CANCELAR ALERTA"
+                                    maxWidth="Infinity"
+                                    styleClass="btn-cancel"
+                                    onAction="#onCancelClicked"/>
+
+                            <Label text="Alerta Naranja — Mensajes" styleClass="msg-title"/>
+
+                            <HBox spacing="10">
+                                <children>
+                                    <TextField fx:id="messageField"
+                                               promptText="Escribe un mensaje para tus contactos..."
+                                               HBox.hgrow="ALWAYS"/>
+                                    <Button fx:id="sendMessageButton"
+                                            text="Enviar"
+                                            onAction="#onSendMessageClicked"/>
+                                </children>
+                            </HBox>
+
+                            <Label text="Log de alertas" styleClass="log-title"/>
+
+                            <TextArea fx:id="logArea"
+                                      wrapText="true"
+                                      prefRowCount="10"
+                                      VBox.vgrow="ALWAYS"/>
+                        </children>
+                    </VBox>
+                </HBox>
+            </children>
+        </AnchorPane>
+    </center>
+</BorderPane>
