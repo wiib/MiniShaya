@@ -1,0 +1,30 @@
+services:
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: rabbitmq
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+
+  mosquitto:
+    image: eclipse-mosquitto
+    container_name: mosquitto
+    ports:
+      - "1883:1883"
+    volumes:
+      - ./mosquitto.conf:/mosquitto/config/mosquitto.conf
+
+  producer:
+    build: ./producer
+    container_name: shaya-producer
+    depends_on:
+      - rabbitmq
+    ports:
+      - "5000:5000"
+
+  consumer:
+    build: ./consumer
+    container_name: shaya-consumer
+    depends_on:
+      - rabbitmq
+      - mosquitto
