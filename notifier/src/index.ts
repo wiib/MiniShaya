@@ -41,6 +41,7 @@ mqttClient.on("connect", () => {
 
 mqttClient.on("message", (topic, buffer) => {
   const payloadJson = JSON.parse(buffer.toString());
+  const alertType = payloadJson.type;
 
   const data: OrangeAlertData = {
     message: payloadJson.message,
@@ -51,7 +52,11 @@ mqttClient.on("message", (topic, buffer) => {
 
   console.log(`Notificando: [${topic}]`, data);
 
-  io.emit("orange-alert", data);
+  if (alertType === "red") {
+    io.emit("red-alert", data);
+  } else if (alertType === "orange") {
+    io.emit("orange-alert", data);
+  }
 });
 
 httpServer.listen(PORT, () => {

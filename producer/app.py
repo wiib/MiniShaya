@@ -61,7 +61,8 @@ def red_alert():
         "type": "red",
         "message": data["message"],
         "topics": ["app/alert/red/global"],
-        "timestamp": datetime.now(timezone.utc).isoformat()
+        "timestamp": datetime.now(timezone.utc).isoformat(),
+        "sender": data["sender_id"]
     }
 
     channel = get_channel()
