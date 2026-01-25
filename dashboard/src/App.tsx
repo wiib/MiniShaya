@@ -3,7 +3,8 @@ import "./App.css";
 import Card from "./components/Card";
 import { socket } from "./services/notifications";
 import type { Alert } from "./types";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
+import Map from "./components/Map";
 
 function App() {
   const [redAlerts, setRedAlerts] = useState<Alert[]>([]);
@@ -62,7 +63,7 @@ function App() {
             </Card>
           </div>
           <div className="col-span-12 lg:col-span-8">
-            <p>easd</p>
+            <Map orangeAlerts={orangeAlerts} redAlerts={redAlerts}></Map>
           </div>
         </div>
       </div>

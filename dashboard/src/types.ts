@@ -3,4 +3,6 @@ export interface Alert {
   message: string;
   sender: string;
   timestamp: string;
+  lat: number;
+  lon: number;
 }
