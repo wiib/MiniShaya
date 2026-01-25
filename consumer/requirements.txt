@@ -1,2 +1,5 @@
 pika
 paho-mqtt
+osmnx
+shapely 
+geopandas

@@ -13,6 +13,8 @@ interface OrangeAlertData {
   sender: string;
   message: string;
   timestamp: string;
+  lat: number;
+  lon: number;
 }
 
 const app = express();
@@ -48,6 +50,8 @@ mqttClient.on("message", (topic, buffer) => {
     sender: payloadJson.sender,
     timestamp: payloadJson.timestamp,
     type: payloadJson.type,
+    lat: payloadJson.lat,
+    lon: payloadJson.lon,
   };
 
   console.log(`Notificando: [${topic}]`, data);

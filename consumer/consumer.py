@@ -3,9 +3,35 @@ import json
 import time
 import paho.mqtt.client as mqtt
 
+import random
+import osmnx as ox
+from shapely.geometry import Point
+
+class CoordsGenerator:
+    def __init__(self):
+        print("Descargando datos geográficos")
+
+        self.gdf = ox.geocode_to_gdf("Cuenca, Azuay, Ecuador")
+        self.base_poly = self.gdf.geometry.iloc[0]
+
+        self.min_x, self.min_y, self.max_x, self.max_y = self.base_poly.bounds
+        print("Datos geográficos cargados")
+
+    def get_coords(self):
+        while True:
+            lon = random.uniform(self.min_x, self.max_x)
+            lat = random.uniform(self.min_y, self.max_y)
+
+            pt = Point(lon, lat)
+
+            if self.base_poly.contains(pt):
+                return lat, lon
+
 RABBIT_HOST = "rabbitmq"
 QUEUE_NAME = "alerts"
 MQTT_HOST = "mosquitto"
+
+coords_generator = CoordsGenerator()
 
 # ---------- MQTT ----------
 mqtt_client = mqtt.Client()
@@ -35,6 +61,10 @@ channel.queue_declare(queue=QUEUE_NAME, durable=True)
 # ---------- CALLBACK ----------
 def callback(ch, method, properties, body):
     event = json.loads(body)
+
+    lat, lon = coords_generator.get_coords()
+    event["lat"] = lat
+    event["lon"] = lon
 
     for topic in event["topics"]:
         mqtt_client.publish(topic, json.dumps(event))
