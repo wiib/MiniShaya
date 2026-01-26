@@ -31,7 +31,7 @@ function App() {
         <h2 className="text-2xl font-bold text-center flex-none">MiniShaya</h2>
         <div className="grid grid-cols-12 gap-2 flex-1 min-h-0">
           <div className="col-span-12 lg:col-span-4 flex flex-col gap-2 h-full overflow-hidden">
-            <Card className="bg-white flex-1 min-h-0" title="Alertas Rojas">
+            <Card className="bg-white flex-1 min-h-0 border border-gray-400" title="Alertas Rojas">
               <div className="flex flex-col gap-2 overflow-y-auto flex-1 pr-4">
                 {redAlerts.map((alert, i) => (
                   <motion.div
@@ -46,7 +46,7 @@ function App() {
                 ))}
               </div>
             </Card>
-            <Card className="bg-white flex-1 min-h-0" title="Alertas Naranja">
+            <Card className="bg-white flex-1 min-h-0 border border-gray-400" title="Alertas Naranja">
               <div className="flex flex-col gap-2 overflow-y-auto flex-1 pr-4">
                 {orangeAlerts.map((alert, i) => (
                   <motion.div
@@ -62,7 +62,7 @@ function App() {
               </div>
             </Card>
           </div>
-          <div className="col-span-12 lg:col-span-8">
+          <div className="col-span-12 lg:col-span-8 flex-1 min-h-0">
             <Map orangeAlerts={orangeAlerts} redAlerts={redAlerts}></Map>
           </div>
         </div>
@@ -79,7 +79,7 @@ function RedAlert(props: AlertProps) {
   return (
     <Card className="bg-red-100 text-red-800">
       <div className="flex flex-col">
-        <span className="text-red-400">{props.data.timestamp}</span>
+        <span className="text-red-400">{new Date(props.data.timestamp).toString()}</span>
         <span>
           <b>Alerta Roja</b> — {props.data.sender} necesita ayuda
         </span>
@@ -95,7 +95,7 @@ function OrangeAlert(props: AlertProps) {
   return (
     <Card className="bg-orange-100 text-orange-800">
       <div className="flex flex-col">
-        <span className="text-orange-400">{props.data.timestamp}</span>
+        <span className="text-orange-400">{new Date(props.data.timestamp).toString()}</span>
         <span>
           <b>Alerta Naranja</b> — {props.data.sender} necesita ayuda
         </span>

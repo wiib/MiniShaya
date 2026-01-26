@@ -17,7 +17,7 @@ function Map(props: MapProps) {
   const center: [number, number] = [-2.90055, -79.00453];
 
   return (
-    <div className="w-full h-full">
+    <div className="w-full h-full border border-gray-400">
       <MapContainer center={center} zoom={13} style={{ height: "100%", width: "100%" }}>
         <TileLayer attribution="&copy; OpenStreetMap" url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
         {props.redAlerts.length > 0 && <ReCenterMap lat={props.redAlerts[0].lat} lon={props.redAlerts[0].lon} />}
