@@ -110,14 +110,14 @@ def orange_alert():
 @app.route("/alert/red", methods=["POST"])
 def red_alert():
     data = request.json
-    message = data["message"]
+
+    message = data.get("message", "")
 
     event = {
         "type": "red",
         "message": message,
         "topics": ["app/alert/red/global"],
-        "timestamp": datetime.now(timezone.utc).isoformat(),
-        "sender": data["sender_id"]
+        "timestamp": datetime.now(timezone.utc).isoformat()
     }
 
     channel = get_channel()
@@ -130,7 +130,7 @@ def red_alert():
 
     log(
         service="producer",
-        level="WARN",
+        level="INFO",
         event_type="ALERT_RED",
         message="Alerta roja enviada (broadcast)"
     )
