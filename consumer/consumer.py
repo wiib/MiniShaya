@@ -1,80 +1,97 @@
 import pika
 import json
 import time
-import paho.mqtt.client as mqtt
-
 import random
+import paho.mqtt.client as mqtt
+from datetime import datetime, timezone
 import osmnx as ox
 from shapely.geometry import Point
-
-class CoordsGenerator:
-    def __init__(self):
-        print("Descargando datos geográficos")
-
-        self.gdf = ox.geocode_to_gdf("Cuenca, Azuay, Ecuador")
-        self.base_poly = self.gdf.geometry.iloc[0]
-
-        self.min_x, self.min_y, self.max_x, self.max_y = self.base_poly.bounds
-        print("Datos geográficos cargados")
-
-    def get_coords(self):
-        while True:
-            lon = random.uniform(self.min_x, self.max_x)
-            lat = random.uniform(self.min_y, self.max_y)
-
-            pt = Point(lon, lat)
-
-            if self.base_poly.contains(pt):
-                return lat, lon
 
 RABBIT_HOST = "rabbitmq"
 QUEUE_NAME = "alerts"
 MQTT_HOST = "mosquitto"
 
-coords_generator = CoordsGenerator()
+# -------- LOG JSON --------
+def log(service, level, event_type, message, extra=None):
+    entry = {
+        "timestamp": datetime.now(timezone.utc).isoformat(),
+        "service": service,
+        "level": level,
+        "event_type": event_type,
+        "message": message
+    }
+    if extra:
+        entry.update(extra)
+    print(json.dumps(entry), flush=True)
 
-# ---------- MQTT ----------
+# -------- GEO --------
+class CoordsGenerator:
+    def __init__(self):
+        log("consumer", "INFO", "GEO_INIT", "Descargando datos geográficos de Cuenca")
+        self.gdf = ox.geocode_to_gdf("Cuenca, Azuay, Ecuador")
+        self.base_poly = self.gdf.geometry.iloc[0]
+        self.min_x, self.min_y, self.max_x, self.max_y = self.base_poly.bounds
+        log("consumer", "INFO", "GEO_READY", "Datos geográficos cargados")
+
+    def get_coords(self):
+        while True:
+            lon = random.uniform(self.min_x, self.max_x)
+            lat = random.uniform(self.min_y, self.max_y)
+            if self.base_poly.contains(Point(lon, lat)):
+                return lat, lon
+
+coords = CoordsGenerator()
+
+# -------- MQTT --------
 mqtt_client = mqtt.Client()
 mqtt_client.connect(MQTT_HOST, 1883, 60)
 mqtt_client.loop_start()
 
-print("[CONSUMER] Conectado a Mosquitto")
+log("consumer", "INFO", "MQTT_CONNECT", "Conectado a Mosquitto")
 
-# ---------- RABBITMQ (REINTENTO REAL) ----------
+# -------- RABBIT --------
 def connect_rabbit():
     while True:
         try:
-            print("[CONSUMER] Conectando a RabbitMQ...")
-            connection = pika.BlockingConnection(
-                pika.ConnectionParameters(host=RABBIT_HOST)
-            )
-            print("[CONSUMER] Conectado a RabbitMQ")
-            return connection
+            log("consumer", "INFO", "RABBIT_CONNECT", "Intentando conexión a RabbitMQ")
+            conn = pika.BlockingConnection(pika.ConnectionParameters(host=RABBIT_HOST))
+            log("consumer", "INFO", "RABBIT_CONNECTED", "Conectado a RabbitMQ")
+            return conn
         except pika.exceptions.AMQPConnectionError:
-            print("[CONSUMER] RabbitMQ no disponible, reintentando...")
+            log("consumer", "ERROR", "RABBIT_RETRY", "RabbitMQ no disponible, reintentando en 5s")
             time.sleep(5)
 
 connection = connect_rabbit()
 channel = connection.channel()
 channel.queue_declare(queue=QUEUE_NAME, durable=True)
 
-# ---------- CALLBACK ----------
+# -------- CALLBACK --------
 def callback(ch, method, properties, body):
     event = json.loads(body)
 
-    lat, lon = coords_generator.get_coords()
+    event["sender"] = event.get("sender", "unknown")
+    lat, lon = coords.get_coords()
     event["lat"] = lat
     event["lon"] = lon
 
-    for topic in event["topics"]:
+    log(
+        "consumer", "INFO", "EVENT_RECEIVED",
+        "Evento recibido",
+        {
+            "type": event.get("type"),
+            "sender": event.get("sender"),
+            "lat": lat,
+            "lon": lon
+        }
+    )
+
+    for topic in event.get("topics", []):
         mqtt_client.publish(topic, json.dumps(event))
-        print(f"[CONSUMER] MQTT → {topic}")
 
     ch.basic_ack(delivery_tag=method.delivery_tag)
 
-# ---------- CONSUMO ----------
 channel.basic_qos(prefetch_count=1)
 channel.basic_consume(queue=QUEUE_NAME, on_message_callback=callback)
 
-print("[CONSUMER] Esperando mensajes...")
+log("consumer", "INFO", "CONSUMER_READY", "Esperando mensajes")
 channel.start_consuming()
