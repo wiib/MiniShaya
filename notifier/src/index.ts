@@ -3,10 +3,10 @@ import { createServer } from "http";
 import mqtt from "mqtt";
 import { Server } from "socket.io";
 
-const MQTT_BROKER = "mqtt://localhost:1883";
+const MQTT_BROKER = "mqtt://mosquitto:1883";
 const MQTT_ORANGE_TOPIC = "app/alert/orange/#";
 const MQTT_RED_TOPIC = "app/alert/red/#";
-const PORT = 3000;
+const PORT = 3001;
 
 interface OrangeAlertData {
   type: string;

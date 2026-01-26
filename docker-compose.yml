@@ -29,6 +29,14 @@ services:
       - rabbitmq
       - mosquitto
 
+  notifier:
+    build: ./notifier
+    container_name: shaya-notifier
+    depends_on:
+      - consumer
+    ports:
+      - "3001:3001"
+
   loki:
     image: grafana/loki:2.9.4
     container_name: loki
@@ -56,4 +64,3 @@ services:
       - "3000:3000"
     depends_on:
       - loki
-
