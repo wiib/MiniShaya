@@ -84,7 +84,9 @@
   <h2 class="text-2xl font-bold text-center">Cliente MiniShaya</h2>
   <div class="grid grid-cols-12 gap-4">
     <div class="col-span-12 lg:col-span-4 mb-auto">
-      <div class="bg-white rounded-xl p-4 flex flex-col gap-2 shadow-md mb-2">
+      <div
+        class="bg-white rounded-xl p-4 flex flex-col gap-2 shadow-md mb-2 border border-gray-400"
+      >
         <h3 class="text-xl font-bold text-center mb-4">Usuario</h3>
         <div class="flex flex-row gap-2">
           <input
@@ -105,7 +107,9 @@
           </button>
         </div>
       </div>
-      <div class="bg-white rounded-xl p-4 flex flex-col gap-2 shadow-md mb-2">
+      <div
+        class="bg-white rounded-xl p-4 flex flex-col gap-2 shadow-md mb-2 border border-gray-400"
+      >
         <h3 class="text-xl font-bold text-center mb-4">Enviar Alerta</h3>
         <input
           type="text"
@@ -128,58 +132,32 @@
           Alerta Naranja
         </button>
       </div>
-      {#if receivedAlert && shouldShowAlert(receivedAlert)}
-        <div class="bg-white rounded-xl p-4 flex flex-col gap-2 shadow-md">
-          <h3 class="text-xl font-bold text-center mb-4">Alerta Recibida</h3>
-          <div class="flex flex-row justify-between">
-            <span class="font-bold">Tipo:</span>
-            <span>{receivedAlert.type === "red" ? "ROJA" : "NARANJA"}</span>
-          </div>
-          <div class="flex flex-row justify-between">
-            <span class="font-bold">Emisor:</span>
-            <span>{receivedAlert.sender}</span>
-          </div>
-          <div class="flex flex-row justify-between">
-            <span class="font-bold">Mensaje:</span>
-            <span>{receivedAlert.message}</span>
-          </div>
-          <span class="font-bold text-center">Ubicación</span>
-          <div style="width: 100%; height: 250px">
-            <Map options={{ center: [receivedAlert.lat, receivedAlert.lon], zoom: 15 }}>
-              <TileLayer url={"https://tile.openstreetmap.org/{z}/{x}/{y}.png"} />
-              <Marker latLng={[receivedAlert.lat, receivedAlert.lon]} />
-            </Map>
-          </div>
-        </div>
-      {/if}
-    </div>
-    <div class="col-span-12 lg:col-span-8 bg-white rounded-xl p-4 flex flex-col shadow-md mb-auto">
-      <h3 class="text-xl font-bold text-center mb-4">Chat</h3>
-      <div class="flex flex-col gap-2">
-        <span>msg1</span>
-        <span>msg2</span>
-        <span>msg1</span>
-        <span>msg2</span><span>msg1</span>
-        <span>msg2</span><span>msg1</span>
-        <span>msg2</span><span>msg1</span>
-        <span>msg2</span><span>msg1</span>
-        <span>msg2</span><span>msg1</span>
-        <span>msg2</span>
-      </div>
-      <div class="flex flex-row gap-2">
-        <input
-          type="text"
-          name="message"
-          id="message"
-          class="grow p-2 border border-gray-300 rounded-md"
-          placeholder="Escribe aquí tu mensaje..."
-        />
-        <button class="bg-green-400 hover:bg-green-300 rounded-md p-2 w-16 cursor-pointer">
-          Enviar
-        </button>
-      </div>
     </div>
   </div>
+  {#if receivedAlert && shouldShowAlert(receivedAlert)}
+    <div class="col-span-12 lg:col-span-8 bg-white rounded-xl p-4 flex flex-col gap-2 shadow-md">
+      <h3 class="text-xl font-bold text-center mb-4">Alerta Recibida</h3>
+      <div class="flex flex-row justify-between">
+        <span class="font-bold">Tipo:</span>
+        <span>{receivedAlert.type === "red" ? "ROJA" : "NARANJA"}</span>
+      </div>
+      <div class="flex flex-row justify-between">
+        <span class="font-bold">Emisor:</span>
+        <span>{receivedAlert.sender}</span>
+      </div>
+      <div class="flex flex-row justify-between">
+        <span class="font-bold">Mensaje:</span>
+        <span>{receivedAlert.message}</span>
+      </div>
+      <span class="font-bold text-center">Ubicación</span>
+      <div style="width: 100%; height: 500px">
+        <Map options={{ center: [receivedAlert.lat, receivedAlert.lon], zoom: 15 }}>
+          <TileLayer url={"https://tile.openstreetmap.org/{z}/{x}/{y}.png"} />
+          <Marker latLng={[receivedAlert.lat, receivedAlert.lon]} />
+        </Map>
+      </div>
+    </div>
+  {/if}
 </main>
 
 <style>
