@@ -1,3 +1,5 @@
+import os
+import math
 import pika
 import json
 import time
@@ -42,6 +44,14 @@ class CoordsGenerator:
 
 coords = CoordsGenerator()
 
+# -------- PROCESSING ---------
+
+STRESS_LEVEL = int(os.getenv("STRESS_LEVEL", "20000"))
+def simulate_calc():
+    temp_result = 0
+    for i in range(1, STRESS_LEVEL):
+        temp_result += math.sqrt(i) * math.pow(i, 2)
+
 # -------- MQTT --------
 mqtt_client = mqtt.Client()
 mqtt_client.connect(MQTT_HOST, 1883, 60)
@@ -68,6 +78,8 @@ channel.queue_declare(queue=QUEUE_NAME, durable=True)
 # -------- CALLBACK --------
 def callback(ch, method, properties, body):
     event = json.loads(body)
+
+    simulate_calc()
 
     event["sender"] = event.get("sender", "unknown")
     lat, lon = coords.get_coords()
