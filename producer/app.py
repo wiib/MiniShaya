@@ -114,12 +114,14 @@ def red_alert():
     data = request.json
 
     message = data.get("message", "")
+    sender  = data.get("sender_id", "unknown")
 
     event = {
         "type": "red",
         "message": message,
         "topics": ["app/alert/red/global"],
-        "timestamp": datetime.now(timezone.utc).isoformat()
+        "timestamp": datetime.now(timezone.utc).isoformat(),
+        "sender": sender
     }
 
     channel = get_channel()
