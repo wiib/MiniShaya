@@ -11,7 +11,7 @@
 
   let receivedAlert: any = $state();
 
-  const PRODUCER_URL = "http://localhost:5000";
+  const PRODUCER_URL = "http://192.168.49.2:30051";
 
   onMount(() => {
     socket.on("red-alert", (data) => {

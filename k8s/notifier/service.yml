@@ -3,8 +3,9 @@ kind: Service
 metadata:
   name: notifier
 spec:
-  type: LoadBalancer
+  type: NodePort
   selector:
     app: notifier
   ports:
     - port: 3001
+      nodePort: 30050

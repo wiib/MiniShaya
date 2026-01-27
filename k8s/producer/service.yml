@@ -3,8 +3,9 @@ kind: Service
 metadata:
   name: producer
 spec:
-  type: LoadBalancer
+  type: NodePort
   selector:
     app: producer
   ports:
     - port: 5000
+      nodePort: 30051
