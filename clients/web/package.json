@@ -21,6 +21,7 @@
   },
   "dependencies": {
     "@tailwindcss/vite": "^4.1.18",
+    "mqtt": "^5.14.1",
     "socket.io-client": "^4.8.3",
     "sveaflet": "^0.1.4",
     "tailwindcss": "^4.1.18"

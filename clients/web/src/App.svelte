@@ -1,8 +1,10 @@
 <script lang="ts">
-  import { onDestroy, onMount } from "svelte";
-  import { Map, TileLayer, Marker, Popup } from "sveaflet";
+  import { onMount } from "svelte";
+  import { Map, TileLayer, Marker } from "sveaflet";
 
   import { socket } from "./services/notifications";
+  import type { MqttClient } from "mqtt";
+  import mqtt from "mqtt";
 
   let userName = $state("");
   let userNameLocked = $state(false);
@@ -12,20 +14,38 @@
   let receivedAlert: any = $state();
 
   const PRODUCER_URL = "http://192.168.49.2:30051";
+  const MQTT_URL = "ws://192.168.49.2:30001";
+  const MQTT_ORANGE_TOPIC = "app/alert/orange/#";
+  const MQTT_RED_TOPIC = "app/alert/red/#";
+
+  let client: MqttClient;
 
   onMount(() => {
-    socket.on("red-alert", (data) => {
-      receivedAlert = data;
+    client = mqtt.connect(MQTT_URL, {
+      clientId: "frontend_" + Math.random().toString(16).substr(2, 8),
+      keepalive: 60,
+      clean: true,
+      reconnectPeriod: 1000,
     });
 
-    socket.on("orange-alert", (data) => {
+    client.on("connect", () => {
+      const topics = [MQTT_ORANGE_TOPIC, MQTT_RED_TOPIC];
+      client.subscribe(topics);
+    });
+
+    client.on("message", (topic, buffer) => {
+      const payloadJson = JSON.parse(buffer.toString());
+      const data = {
+        message: payloadJson.message,
+        sender: payloadJson.sender,
+        timestamp: payloadJson.timestamp,
+        type: payloadJson.type,
+        lat: payloadJson.lat,
+        lon: payloadJson.lon,
+      };
+
       receivedAlert = data;
     });
-  });
-
-  onDestroy(() => {
-    socket.off("red-alert");
-    socket.off("orange-alert");
   });
 
   function disableName() {
@@ -74,7 +94,6 @@
 
   function shouldShowAlert(alert: any) {
     if (alert.sender == userName) return false;
-    if (alert.target !== userName) return false;
 
     return true;
   }
@@ -133,31 +152,38 @@
         </button>
       </div>
     </div>
+    {#if receivedAlert && shouldShowAlert(receivedAlert)}
+      <div
+        class="col-span-12 lg:col-span-8 bg-white rounded-xl p-4 flex flex-col gap-2 shadow-md border border-gray-400"
+      >
+        <h3 class="text-xl font-bold text-center mb-4">Alerta Recibida</h3>
+        <div class="flex flex-row justify-between">
+          <span class="font-bold">Tipo:</span>
+          <span>{receivedAlert.type === "red" ? "ROJA" : "NARANJA"}</span>
+        </div>
+        <div class="flex flex-row justify-between">
+          <span class="font-bold">Emisor:</span>
+          <span>{receivedAlert.sender}</span>
+        </div>
+        <div class="flex flex-row justify-between">
+          <span class="font-bold">Mensaje:</span>
+          <span>{receivedAlert.message}</span>
+        </div>
+        <span class="font-bold text-center">Ubicación</span>
+        <div style="width: 100%; height: 500px">
+          <Map
+            options={{
+              center: [receivedAlert.lat, receivedAlert.lon],
+              zoom: 15,
+            }}
+          >
+            <TileLayer url={"https://tile.openstreetmap.org/{z}/{x}/{y}.png"} />
+            <Marker latLng={[receivedAlert.lat, receivedAlert.lon]} />
+          </Map>
+        </div>
+      </div>
+    {/if}
   </div>
-  {#if receivedAlert && shouldShowAlert(receivedAlert)}
-    <div class="col-span-12 lg:col-span-8 bg-white rounded-xl p-4 flex flex-col gap-2 shadow-md">
-      <h3 class="text-xl font-bold text-center mb-4">Alerta Recibida</h3>
-      <div class="flex flex-row justify-between">
-        <span class="font-bold">Tipo:</span>
-        <span>{receivedAlert.type === "red" ? "ROJA" : "NARANJA"}</span>
-      </div>
-      <div class="flex flex-row justify-between">
-        <span class="font-bold">Emisor:</span>
-        <span>{receivedAlert.sender}</span>
-      </div>
-      <div class="flex flex-row justify-between">
-        <span class="font-bold">Mensaje:</span>
-        <span>{receivedAlert.message}</span>
-      </div>
-      <span class="font-bold text-center">Ubicación</span>
-      <div style="width: 100%; height: 500px">
-        <Map options={{ center: [receivedAlert.lat, receivedAlert.lon], zoom: 15 }}>
-          <TileLayer url={"https://tile.openstreetmap.org/{z}/{x}/{y}.png"} />
-          <Marker latLng={[receivedAlert.lat, receivedAlert.lon]} />
-        </Map>
-      </div>
-    </div>
-  {/if}
 </main>
 
 <style>
