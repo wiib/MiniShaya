@@ -3,8 +3,15 @@ kind: Service
 metadata:
   name: mosquitto
 spec:
-  type: LoadBalancer
+  type: NodePort
   selector:
     app: mosquitto
   ports:
-    - port: 1883
+    - name: mqtt-tcp
+      port: 1883
+      targetPort: 1883
+      nodePort: 31883 
+    - name: mqtt-ws
+      port: 9001
+      targetPort: 9001
+      nodePort: 30001
